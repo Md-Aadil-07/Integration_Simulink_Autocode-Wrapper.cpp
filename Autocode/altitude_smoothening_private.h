@@ -3,9 +3,9 @@
  *
  * Code generated for Simulink model 'altitude_smoothening'.
  *
- * Model version                  : 1.31
+ * Model version                  : 1.33
  * Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
- * C/C++ source code generated on : Sun Oct 19 12:08:47 2025
+ * C/C++ source code generated on : Sun Oct 19 13:18:22 2025
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Intel->x86-64 (Windows64)
