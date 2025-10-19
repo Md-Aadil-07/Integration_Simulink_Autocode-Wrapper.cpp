@@ -1,39 +1,40 @@
 #include "FlightTrajectorySystem.hpp"
 
-FlightTrajectorySystem::FlightTrajectorySystem() {}
+FlightTrajectorySystem::FlightTrajectorySystem() {
+    // The constructor's job is to link the state structures together,
+    // as the generated code expects.
+    m_modelData.blockIO = &m_blockIO;
+    m_modelData_p.blockIO = &m_blockIO_p;
+}
 
 void FlightTrajectorySystem::initialize() {
-    // The base model is always initialized.
-    altitude_smoothening_initialize();
-
-    // This initialization call is conditional.
-    #ifdef INCLUDE_MODIFIED_TRAJECTORY_MODEL
-    altitude_smoothening_p_initialize();
-    #endif
+    // Call the initialize functions, passing pointers to our internal state
+    // and I/O member variables. This correctly sets everything to zero.
+    altitude_smoothening_initialize(&m_modelData, &m_U_startaltitude, &m_U_totaltime, &m_U_currenttime, &m_U_targetaltitude, &m_Y_desiredaltitude);
+    altitude_smoothening_p_initialize(&m_modelData_p, &m_p_U_startaltitude, &m_p_U_totaltime, &m_p_U_currenttime, &m_p_U_targetaltitude, &m_p_Y_desiredaltitude);
 }
 
-uint16_t FlightTrajectorySystem::runOriginalTrajectory(uint8_t currentTime, uint8_t totalTime, uint8_t startAltitude, uint8_t targetAltitude) {
-    altitude_smoothening_U.currenttime = currentTime;
-    altitude_smoothening_U.totaltime = totalTime;
-    altitude_smoothening_U.startaltitude = startAltitude;
-    altitude_smoothening_U.targetaltitude = targetAltitude;
+// This method guarantees the correct "output -> update" sequence for the original model.
+uint16_t FlightTrajectorySystem::executeStep(uint8_t currentTime, uint8_t totalTime, uint8_t startAltitude, uint8_t targetAltitude) {
+    uint16_t desiredAltitude; // A local variable to hold the output
 
-    altitude_smoothening_step();
+    // --- 1. Call the Output Function ---
+    // Pass the model's state, all inputs by value, and a pointer to our output variable.
+    altitude_smoothening_output(&m_modelData, startAltitude, totalTime, currentTime, targetAltitude, &desiredAltitude);
 
-    return altitude_smoothening_Y.desiredaltitude;
+    // --- 2. Call the Update Function ---
+    // This function advances the model's internal state for the next time step.
+    altitude_smoothening_update(&m_modelData);
+
+    return desiredAltitude;
 }
 
-// This entire function implementation is conditional. It will not be compiled
-// into the final program unless the flag is defined.
-#ifdef INCLUDE_MODIFIED_TRAJECTORY_MODEL
-uint16_t FlightTrajectorySystem::runModifiedTrajectory(uint8_t currentTime, uint8_t totalTime, uint8_t startAltitude, uint8_t targetAltitude) {
-    altitude_smoothening_p_U.currenttime = currentTime;
-    altitude_smoothening_p_U.totaltime = totalTime;
-    altitude_smoothening_p_U.startaltitude = startAltitude;
-    altitude_smoothening_p_U.targetaltitude = targetAltitude;
+// This method does the same for the modified "_p" model.
+uint16_t FlightTrajectorySystem::executeStep_p(uint8_t currentTime, uint8_t totalTime, uint8_t startAltitude, uint8_t targetAltitude) {
+    uint16_t desiredAltitude; // A local variable for the output
 
-    altitude_smoothening_p_step();
+    altitude_smoothening_p_output(&m_modelData_p, startAltitude, totalTime, currentTime, targetAltitude, &desiredAltitude);
+    altitude_smoothening_p_update(&m_modelData_p);
 
-    return altitude_smoothening_p_Y.desiredaltitude;
+    return desiredAltitude;
 }
-#endif

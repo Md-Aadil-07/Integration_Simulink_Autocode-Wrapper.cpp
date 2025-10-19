@@ -3,9 +3,9 @@
  *
  * Code generated for Simulink model 'altitude_smoothening_p'.
  *
- * Model version                  : 1.35
+ * Model version                  : 1.36
  * Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
- * C/C++ source code generated on : Sun Oct 19 13:20:08 2025
+ * C/C++ source code generated on : Sun Oct 19 16:31:21 2025
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Intel->x86-64 (Windows64)
@@ -18,59 +18,38 @@
 #ifndef altitude_smoothening_p_COMMON_INCLUDES_
 #define altitude_smoothening_p_COMMON_INCLUDES_
 #include "rtwtypes.h"
-#include "math.h"
 #endif                             /* altitude_smoothening_p_COMMON_INCLUDES_ */
 
 #include "altitude_smoothening_p_types.h"
-
-/* Macros for accessing real-time model data structure */
-#ifndef rtmGetErrorStatus
-#define rtmGetErrorStatus(rtm)         ((rtm)->errorStatus)
-#endif
-
-#ifndef rtmSetErrorStatus
-#define rtmSetErrorStatus(rtm, val)    ((rtm)->errorStatus = (val))
-#endif
+#include "rt_defines.h"
+#include <string.h>
 
 /* Block signals (default storage) */
 typedef struct {
   uint16_T Add2;                       /* '<S2>/Add2' */
-} BlockIO_altitude_smoothening_p_T;
-
-/* External inputs (root inport signals with default storage) */
-typedef struct {
-  uint8_T startaltitude;               /* '<Root>/startaltitude' */
-  uint8_T totaltime;                   /* '<Root>/totaltime' */
-  uint8_T currenttime;                 /* '<Root>/currenttime' */
-  uint8_T targetaltitude;              /* '<Root>/targetaltitude' */
-} ExternalInputs_altitude_smoothening_p_T;
-
-/* External outputs (root outports fed by signals with default storage) */
-typedef struct {
-  uint16_T desiredaltitude;            /* '<Root>/desiredaltitude' */
-} ExternalOutputs_altitude_smoothening_p_T;
+} B_altitude_smoothening_p_sT;
 
 /* Real-time Model Data Structure */
-struct tag_RTM_altitude_smoothening_p_T {
-  const char_T * volatile errorStatus;
+struct tag_RTM_altitude_smoothening_p_sT {
+  B_altitude_smoothening_p_sT *blockIO;
 };
 
-/* Block signals (default storage) */
-extern BlockIO_altitude_smoothening_p_T altitude_smoothening_p_B;
-
-/* External inputs (root inport signals with default storage) */
-extern ExternalInputs_altitude_smoothening_p_T altitude_smoothening_p_U;
-
-/* External outputs (root outports fed by signals with default storage) */
-extern ExternalOutputs_altitude_smoothening_p_T altitude_smoothening_p_Y;
-
 /* Model entry point functions */
-extern void altitude_smoothening_p_initialize(void);
-extern void altitude_smoothening_p_step(void);
-extern void altitude_smoothening_p_terminate(void);
-
-/* Real-time Model object */
-extern RT_MODEL_altitude_smoothening_p_T *const altitude_smoothening_p_M;
+extern void altitude_smoothening_p_initialize(RT_MODEL_altitude_smoothening_p_sT
+  *const altitude_smoothening_p_M, uint8_T
+  *altitude_smoothening_p_U_startaltitude, uint8_T
+  *altitude_smoothening_p_U_totaltime, uint8_T
+  *altitude_smoothening_p_U_currenttime, uint8_T
+  *altitude_smoothening_p_U_targetaltitude, uint16_T
+  *altitude_smoothening_p_Y_desiredaltitude);
+extern void altitude_smoothening_p_output(RT_MODEL_altitude_smoothening_p_sT *
+  const altitude_smoothening_p_M, uint8_T altitude_smoothening_p_U_startaltitude,
+  uint8_T altitude_smoothening_p_U_totaltime, uint8_T
+  altitude_smoothening_p_U_currenttime, uint8_T
+  altitude_smoothening_p_U_targetaltitude, uint16_T
+  *altitude_smoothening_p_Y_desiredaltitude);
+extern void altitude_smoothening_p_update(RT_MODEL_altitude_smoothening_p_sT *
+  const altitude_smoothening_p_M);
 
 /*-
  * These blocks were eliminated from the model due to optimizations:
@@ -95,6 +74,11 @@ extern RT_MODEL_altitude_smoothening_p_T *const altitude_smoothening_p_M;
  * '<Root>' : 'altitude_smoothening_p'
  * '<S1>'   : 'altitude_smoothening_p/If Action Subsystem'
  * '<S2>'   : 'altitude_smoothening_p/If Action Subsystem1'
+ */
+
+/*-
+ * Requirements for '<Root>': altitude_smoothening_p
+
  */
 #endif                                 /* altitude_smoothening_p_h_ */
 

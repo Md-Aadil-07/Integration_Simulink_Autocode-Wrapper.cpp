@@ -3,9 +3,9 @@
  *
  * Code generated for Simulink model 'altitude_smoothening'.
  *
- * Model version                  : 1.31
+ * Model version                  : 1.37
  * Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
- * C/C++ source code generated on : Sun Oct 19 12:08:47 2025
+ * C/C++ source code generated on : Sun Oct 19 16:24:49 2025
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Intel->x86-64 (Windows64)
@@ -66,68 +66,6 @@ typedef unsigned long ulong_T;
 typedef char char_T;
 typedef unsigned char uchar_T;
 typedef char_T byte_T;
-
-/*===========================================================================*
- * Complex number type definitions                                           *
- *===========================================================================*/
-#define CREAL_T
-
-typedef struct {
-  real32_T re;
-  real32_T im;
-} creal32_T;
-
-typedef struct {
-  real64_T re;
-  real64_T im;
-} creal64_T;
-
-typedef struct {
-  real_T re;
-  real_T im;
-} creal_T;
-
-#define CINT8_T
-
-typedef struct {
-  int8_T re;
-  int8_T im;
-} cint8_T;
-
-#define CUINT8_T
-
-typedef struct {
-  uint8_T re;
-  uint8_T im;
-} cuint8_T;
-
-#define CINT16_T
-
-typedef struct {
-  int16_T re;
-  int16_T im;
-} cint16_T;
-
-#define CUINT16_T
-
-typedef struct {
-  uint16_T re;
-  uint16_T im;
-} cuint16_T;
-
-#define CINT32_T
-
-typedef struct {
-  int32_T re;
-  int32_T im;
-} cint32_T;
-
-#define CUINT32_T
-
-typedef struct {
-  uint32_T re;
-  uint32_T im;
-} cuint32_T;
 
 /*=======================================================================*
  * Min and Max:                                                          *

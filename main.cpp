@@ -3,12 +3,11 @@
 #include <thread>
 #include "Wrapper/FlightTrajectorySystem.hpp"
 
-const int LOOP_FREQUENCY_HZ = 10;
+const int LOOP_FREQUENCY_HZ = 10; // This MUST match your model's 0.1s sample time
 const auto LOOP_PERIOD = std::chrono::milliseconds(1000 / LOOP_FREQUENCY_HZ);
 
 int main() {
-    std::cout << "--- Trajectory System Host Superloop ---" << std::endl;
-    std::cout << "Running at " << LOOP_FREQUENCY_HZ << " Hz. Press Ctrl+C to exit." << std::endl;
+    std::cout << "--- Trajectory System (Output/Update) Host Superloop ---" << std::endl;
 
     FlightTrajectorySystem trajectorySystem;
     trajectorySystem.initialize();
@@ -24,19 +23,15 @@ int main() {
         auto elapsedTime = loopStartTime - missionStartTime;
         uint8_t currentTime_sec = std::chrono::duration_cast<std::chrono::seconds>(elapsedTime).count();
 
-        // <<< BENCHMARKING START >>>
-        auto timing_start = std::chrono::high_resolution_clock::now();
-
-        uint16_t desiredAltitudeOriginal = trajectorySystem.runOriginalTrajectory(
+        // The main loop now makes one simple, safe call per model.
+        uint16_t desiredAltitude = trajectorySystem.executeStep(
+            currentTime_sec, totalTime, startAltitude, targetAltitude
+        );
+        uint16_t desiredAltitude_p = trajectorySystem.executeStep_p(
             currentTime_sec, totalTime, startAltitude, targetAltitude
         );
 
-        auto timing_end = std::chrono::high_resolution_clock::now();
-        auto execution_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(timing_end - timing_start).count();
-        // <<< BENCHMARKING END >>>
-
-        std::cout << "\r" << "Time: " << (int)currentTime_sec << "s | Desired Alt: " << desiredAltitudeOriginal
-                  << " | Execution Time: " << execution_ns << " ns    " << std::flush;
+        std::cout << "\r" << "Time: " << (int)currentTime_sec << "s | Alt: " << desiredAltitude << " | Alt_p: " << desiredAltitude_p << "    " << std::flush;
 
         auto loopEndTime = std::chrono::steady_clock::now();
         auto executionDuration = loopEndTime - loopStartTime;
@@ -46,6 +41,5 @@ int main() {
             std::this_thread::sleep_for(sleepDuration);
         }
     }
-
     return 0;
 }

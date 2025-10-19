@@ -3,9 +3,9 @@
  *
  * Code generated for Simulink model 'altitude_smoothening'.
  *
- * Model version                  : 1.34
+ * Model version                  : 1.37
  * Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
- * C/C++ source code generated on : Sun Oct 19 13:44:12 2025
+ * C/C++ source code generated on : Sun Oct 19 16:24:49 2025
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Intel->x86-64 (Windows64)
@@ -16,24 +16,33 @@
 #include "altitude_smoothening.h"
 #include "rtwtypes.h"
 
-/* Block signals (default storage) */
-BlockIO_altitude_smoothening_T altitude_smoothening_B;
-
-/* External inputs (root inport signals with default storage) */
-ExternalInputs_altitude_smoothening_T altitude_smoothening_U;
-
-/* External outputs (root outports fed by signals with default storage) */
-ExternalOutputs_altitude_smoothening_T altitude_smoothening_Y;
-
-/* Real-time model */
-static RT_MODEL_altitude_smoothening_T altitude_smoothening_M_;
-RT_MODEL_altitude_smoothening_T *const altitude_smoothening_M =
-  &altitude_smoothening_M_;
-
-/* Model step function */
-void altitude_smoothening_step(void)
+/* Model output function */
+void altitude_smoothening_output(RT_MODEL_altitude_smoothening_sT *const
+  altitude_smoothening_M, uint8_T altitude_smoothening_U_startaltitude, uint8_T
+  altitude_smoothening_U_totaltime, uint8_T altitude_smoothening_U_currenttime,
+  uint8_T altitude_smoothening_U_targetaltitude, uint16_T
+  *altitude_smoothening_Y_desiredaltitude)
 {
+  B_altitude_smoothening_sT *altitude_smoothening_B =
+    altitude_smoothening_M->blockIO;
+  uint16_T Add2;
+  uint16_T desiredaltitude;
+  uint8_T currenttime;
+  uint8_T startaltitude;
   uint8_T tmp;
+  uint8_T totaltime;
+
+  /* Inport: '<Root>/startaltitude' */
+  startaltitude = altitude_smoothening_U_startaltitude;
+
+  /* Inport: '<Root>/totaltime' */
+  totaltime = altitude_smoothening_U_totaltime;
+
+  /* Product: '<S2>/Divide' */
+  Add2 = altitude_smoothening_B->Add2;
+
+  /* Inport: '<Root>/currenttime' */
+  currenttime = altitude_smoothening_U_currenttime;
 
   /* If: '<Root>/If' incorporates:
    *  Inport: '<Root>/currenttime'
@@ -41,18 +50,18 @@ void altitude_smoothening_step(void)
    *  Product: '<Root>/Divide1'
    *  RelationalOperator: '<Root>/Equal'
    */
-  if (altitude_smoothening_U.totaltime <= altitude_smoothening_U.currenttime) {
+  if (totaltime <= currenttime) {
     /* Outputs for IfAction SubSystem: '<Root>/If Action Subsystem' incorporates:
      *  ActionPort: '<S1>/Action Port'
      */
     /* Outport: '<Root>/desiredaltitude' incorporates:
      *  SignalConversion generated from: '<S1>/In1'
      */
-    altitude_smoothening_Y.desiredaltitude = altitude_smoothening_B.Add2;
+    desiredaltitude = Add2;
 
     /* End of Outputs for SubSystem: '<Root>/If Action Subsystem' */
   } else {
-    if (altitude_smoothening_U.totaltime == 0) {
+    if (totaltime == (uint8_T)0) {
       /* Product: '<Root>/Divide1' */
       tmp = MAX_uint8_T;
 
@@ -63,9 +72,8 @@ void altitude_smoothening_step(void)
        *  Inport: '<Root>/targetaltitude'
        *  Sum: '<Root>/Add'
        */
-      tmp = (uint8_T)((uint32_T)(uint8_T)(altitude_smoothening_U.targetaltitude
-        - altitude_smoothening_U.startaltitude) /
-                      altitude_smoothening_U.totaltime);
+      tmp = (uint8_T)((uint32_T)(uint8_T)(altitude_smoothening_U_targetaltitude
+        - startaltitude) / (uint32_T)totaltime);
     }
 
     /* Outputs for IfAction SubSystem: '<Root>/If Action Subsystem1' incorporates:
@@ -76,31 +84,59 @@ void altitude_smoothening_step(void)
      *  Product: '<Root>/Divide1'
      *  Sum: '<S2>/Add1'
      */
-    altitude_smoothening_B.Add2 = (uint16_T)((uint32_T)(uint8_T)
-      (altitude_smoothening_U.startaltitude + tmp) *
-      altitude_smoothening_U.currenttime);
+    Add2 = (uint16_T)((uint32_T)currenttime * (uint32_T)(uint8_T)(startaltitude
+      + tmp));
 
     /* Outport: '<Root>/desiredaltitude' incorporates:
      *  SignalConversion generated from: '<S2>/desiredalt'
      */
-    altitude_smoothening_Y.desiredaltitude = altitude_smoothening_B.Add2;
+    desiredaltitude = Add2;
 
     /* End of Outputs for SubSystem: '<Root>/If Action Subsystem1' */
   }
 
   /* End of If: '<Root>/If' */
+
+  /* Product: '<S2>/Divide' */
+  altitude_smoothening_B->Add2 = Add2;
+
+  /* Outport: '<Root>/desiredaltitude' */
+  *altitude_smoothening_Y_desiredaltitude = desiredaltitude;
+}
+
+/* Model update function */
+void altitude_smoothening_update(RT_MODEL_altitude_smoothening_sT *const
+  altitude_smoothening_M)
+{
+  UNUSED_PARAMETER(altitude_smoothening_M);
+
+  /* (no update code required) */
 }
 
 /* Model initialize function */
-void altitude_smoothening_initialize(void)
+void altitude_smoothening_initialize(RT_MODEL_altitude_smoothening_sT *const
+  altitude_smoothening_M, uint8_T *altitude_smoothening_U_startaltitude, uint8_T
+  *altitude_smoothening_U_totaltime, uint8_T *altitude_smoothening_U_currenttime,
+  uint8_T *altitude_smoothening_U_targetaltitude, uint16_T
+  *altitude_smoothening_Y_desiredaltitude)
 {
-  /* (no initialization code required) */
-}
+  B_altitude_smoothening_sT *altitude_smoothening_B =
+    altitude_smoothening_M->blockIO;
 
-/* Model terminate function */
-void altitude_smoothening_terminate(void)
-{
-  /* (no terminate code required) */
+  /* Registration code */
+
+  /* block I/O */
+  (void) memset(((void *) altitude_smoothening_B), 0,
+                sizeof(B_altitude_smoothening_sT));
+
+  /* external inputs */
+  *altitude_smoothening_U_startaltitude = 0U;
+  *altitude_smoothening_U_totaltime = 0U;
+  *altitude_smoothening_U_currenttime = 0U;
+  *altitude_smoothening_U_targetaltitude = 0U;
+
+  /* external outputs */
+  *altitude_smoothening_Y_desiredaltitude = 0U;
 }
 
 /*
