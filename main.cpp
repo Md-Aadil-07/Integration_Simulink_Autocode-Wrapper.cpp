@@ -3,7 +3,6 @@
 #include <thread>
 #include "Wrapper/FlightTrajectorySystem.hpp"
 
-// This loop frequency must match the sample time of your Simulink models (1 / 0.1s = 10 Hz)
 const int LOOP_FREQUENCY_HZ = 10;
 const auto LOOP_PERIOD = std::chrono::milliseconds(1000 / LOOP_FREQUENCY_HZ);
 
@@ -25,24 +24,19 @@ int main() {
         auto elapsedTime = loopStartTime - missionStartTime;
         uint8_t currentTime_sec = std::chrono::duration_cast<std::chrono::seconds>(elapsedTime).count();
 
-        // The original model is always executed.
+        // <<< BENCHMARKING START >>>
+        auto timing_start = std::chrono::high_resolution_clock::now();
+
         uint16_t desiredAltitudeOriginal = trajectorySystem.runOriginalTrajectory(
             currentTime_sec, totalTime, startAltitude, targetAltitude
         );
 
-        // Print the output, using '\r' to keep it on a single updating line.
-        std::cout << "\r" << "Time: " << (int)currentTime_sec << "s | Original Alt: " << desiredAltitudeOriginal;
+        auto timing_end = std::chrono::high_resolution_clock::now();
+        auto execution_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(timing_end - timing_start).count();
+        // <<< BENCHMARKING END >>>
 
-        // This block is conditional. It will only be compiled if the flag is set.
-        // This allows this same main.cpp to work for both build configurations.
-        #ifdef INCLUDE_MODIFIED_TRAJECTORY_MODEL
-        uint16_t desiredAltitudeModified = trajectorySystem.runModifiedTrajectory(
-            currentTime_sec, totalTime, startAltitude, targetAltitude
-        );
-        std::cout << " | Modified Alt: " << desiredAltitudeModified;
-        #endif
-
-        std::cout << "    " << std::flush; // Add padding and flush the output buffer
+        std::cout << "\r" << "Time: " << (int)currentTime_sec << "s | Desired Alt: " << desiredAltitudeOriginal
+                  << " | Execution Time: " << execution_ns << " ns    " << std::flush;
 
         auto loopEndTime = std::chrono::steady_clock::now();
         auto executionDuration = loopEndTime - loopStartTime;
