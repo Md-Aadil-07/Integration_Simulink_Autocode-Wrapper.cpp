@@ -3,19 +3,13 @@
 #include <thread>
 #include "Wrapper/FlightTrajectorySystem.hpp"
 
-// --- Configuration ---
-// This value is now dictated by the design of your Simulink model.
-// Your Simulink Sample Time is 0.1 seconds, which is a frequency of 1 / 0.1 = 10 Hz.
-// THIS CONSTANT MUST MATCH YOUR SIMULINK SAMPLE TIME!
+// This loop frequency must match the sample time of your Simulink models (1 / 0.1s = 10 Hz)
 const int LOOP_FREQUENCY_HZ = 10;
-
-// This calculation remains the same.
 const auto LOOP_PERIOD = std::chrono::milliseconds(1000 / LOOP_FREQUENCY_HZ);
 
-
 int main() {
-    std::cout << "--- Trajectory System Host Superloop (Discrete-Time Simulation) ---" << std::endl;
-    std::cout << "Running at a fixed frequency of " << LOOP_FREQUENCY_HZ << " Hz (0.1s sample time). Press Ctrl+C to exit." << std::endl;
+    std::cout << "--- Trajectory System Host Superloop ---" << std::endl;
+    std::cout << "Running at " << LOOP_FREQUENCY_HZ << " Hz. Press Ctrl+C to exit." << std::endl;
 
     FlightTrajectorySystem trajectorySystem;
     trajectorySystem.initialize();
@@ -28,20 +22,27 @@ int main() {
 
     while (true) {
         auto loopStartTime = std::chrono::steady_clock::now();
-
         auto elapsedTime = loopStartTime - missionStartTime;
         uint8_t currentTime_sec = std::chrono::duration_cast<std::chrono::seconds>(elapsedTime).count();
 
-        // The core logic execution remains identical. The superloop's timing
-        // is what ensures the model's sample time requirement is met.
-        uint16_t desiredAltitude = trajectorySystem.runOriginalTrajectory(
-            currentTime_sec,
-            totalTime,
-            startAltitude,
-            targetAltitude
+        // The original model is always executed.
+        uint16_t desiredAltitudeOriginal = trajectorySystem.runOriginalTrajectory(
+            currentTime_sec, totalTime, startAltitude, targetAltitude
         );
 
-        std::cout << "\r" << "Mission Time: " << (int)currentTime_sec << "s  |  Desired Altitude: " << desiredAltitude << "    " << std::flush;
+        // Print the output, using '\r' to keep it on a single updating line.
+        std::cout << "\r" << "Time: " << (int)currentTime_sec << "s | Original Alt: " << desiredAltitudeOriginal;
+
+        // This block is conditional. It will only be compiled if the flag is set.
+        // This allows this same main.cpp to work for both build configurations.
+        #ifdef INCLUDE_MODIFIED_TRAJECTORY_MODEL
+        uint16_t desiredAltitudeModified = trajectorySystem.runModifiedTrajectory(
+            currentTime_sec, totalTime, startAltitude, targetAltitude
+        );
+        std::cout << " | Modified Alt: " << desiredAltitudeModified;
+        #endif
+
+        std::cout << "    " << std::flush; // Add padding and flush the output buffer
 
         auto loopEndTime = std::chrono::steady_clock::now();
         auto executionDuration = loopEndTime - loopStartTime;

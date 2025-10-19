@@ -1,53 +1,32 @@
 #pragma once
 
-#include <stdint.h> // Include standard integer types for clarity (uint8_t, uint16_t)
+#include <stdint.h> // For standard integer types
 
-// This is the most critical part for C/C++ interoperability.
-// It tells the C++ compiler that the functions declared inside these
-// header files are C functions, preventing C++ name mangling issues.
+// The extern "C" block is crucial for linking C++ with C code.
 extern "C" {
-#include "altitude_smoothening.h"
-#include "altitude_smoothening_p.h"
+    // The base model is always included.
+    #include "altitude_smoothening.h"
+
+    // This block is conditional. The preprocessor will only include this header
+    // if we provide the INCLUDE_MODIFIED_TRAJECTORY_MODEL flag during compilation.
+    #ifdef INCLUDE_MODIFIED_TRAJECTORY_MODEL
+    #include "altitude_smoothening_p.h"
+    #endif
 }
 
 /**
  * @class FlightTrajectorySystem
- * @brief A C++ wrapper to manage and consolidate the auto-generated Simulink models.
- *
- * This class provides a clean, object-oriented interface to the underlying C code
- * generated for the 'altitude_smoothening' and 'altitude_smoothening_p' models.
- * It encapsulates the global variables and C-style function calls, presenting
- * a stable API to the rest of the application.
+ * @brief A modular C++ wrapper for Simulink models, configurable at compile time.
  */
 class FlightTrajectorySystem {
 public:
-    /**
-     * @brief Constructor for the FlightTrajectorySystem.
-     */
     FlightTrajectorySystem();
-
-    /**
-     * @brief Initializes both underlying C models. Must be called once before use.
-     */
     void initialize();
-
-    /**
-     * @brief Executes one step of the original trajectory generation logic.
-     * @param currentTime The current elapsed time of the maneuver.
-     * @param totalTime The total planned duration of the maneuver.
-     * @param startAltitude The altitude at the beginning of the maneuver.
-     * @param targetAltitude The desired final altitude.
-     * @return The calculated desired altitude for the current time step.
-     */
     uint16_t runOriginalTrajectory(uint8_t currentTime, uint8_t totalTime, uint8_t startAltitude, uint8_t targetAltitude);
 
-    /**
-     * @brief Executes one step of the modified trajectory generation logic.
-     * @param currentTime The current elapsed time of the maneuver.
-     * @param totalTime The total planned duration of the maneuver.
-     * @param startAltitude The altitude at the beginning of the maneuver.
-     * @param targetAltitude The desired final altitude.
-     * @return The calculated desired altitude for the current time step from the modified model.
-     */
+    // This method declaration is conditional. It will only exist in the class
+    // if the compile-time flag is set.
+    #ifdef INCLUDE_MODIFIED_TRAJECTORY_MODEL
     uint16_t runModifiedTrajectory(uint8_t currentTime, uint8_t totalTime, uint8_t startAltitude, uint8_t targetAltitude);
+    #endif
 };

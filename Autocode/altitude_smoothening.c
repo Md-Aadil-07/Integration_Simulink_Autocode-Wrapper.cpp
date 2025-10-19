@@ -3,9 +3,9 @@
  *
  * Code generated for Simulink model 'altitude_smoothening'.
  *
- * Model version                  : 1.33
+ * Model version                  : 1.34
  * Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
- * C/C++ source code generated on : Sun Oct 19 13:18:22 2025
+ * C/C++ source code generated on : Sun Oct 19 13:44:12 2025
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Intel->x86-64 (Windows64)
@@ -41,7 +41,7 @@ void altitude_smoothening_step(void)
    *  Product: '<Root>/Divide1'
    *  RelationalOperator: '<Root>/Equal'
    */
-  if (altitude_smoothening_U.totaltime >= altitude_smoothening_U.currenttime) {
+  if (altitude_smoothening_U.totaltime <= altitude_smoothening_U.currenttime) {
     /* Outputs for IfAction SubSystem: '<Root>/If Action Subsystem' incorporates:
      *  ActionPort: '<S1>/Action Port'
      */
